@@ -1,5 +1,4 @@
 import './polyfills';
-import './i18n';
 
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -11,7 +10,7 @@ if (__MODE__ === 'production') {
 }
 
 export function bootstrap() {
-  platformBrowserDynamic()
+  return platformBrowserDynamic()
     .bootstrapModule(AppModule)
     .catch(err => console.log(err));
 }

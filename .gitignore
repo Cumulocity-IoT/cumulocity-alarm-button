@@ -33,3 +33,4 @@ bin/
 .vscode/settings.json
 node_modules
 dist
+.angular

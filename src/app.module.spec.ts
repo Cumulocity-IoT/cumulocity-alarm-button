@@ -8,7 +8,7 @@ describe('Example test', () => {
     testComponent = TestBed.createComponent(TestComponent);
   });*/
 
-  test('Always true', () => {
+  it('Always true', () => {
     expect(true).toBe(true);
   });
 });

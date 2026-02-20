@@ -1,0 +1,62 @@
+<div class="form-group">
+  <c8y-form-group>
+    <label>Alarm Reason, you can use {{ "$" }}{{ "{" }}iso_string{{ "}" }} or
+      {{ "$" }}{{ "{" }}timestamp{{ "}" }} as variables</label>
+    <textarea
+      style="width:100%"
+      [(ngModel)]="config.text"
+    ></textarea>
+  </c8y-form-group>
+  <c8y-form-group>
+    <label>Button Text</label>
+    <input
+      style="width:100%"
+      placeholder="Raise Alarm"
+      [(ngModel)]="config.buttonText"
+    />
+  </c8y-form-group>
+  <c8y-form-group>
+    <label>Alarm Type</label>
+    <input
+      style="width:100%"
+      placeholder="e.g. c8y_BreakdownAlarmType"
+      [(ngModel)]="config.type"
+    />
+  </c8y-form-group>
+  <c8y-form-group>
+    <label class="text-truncate" [title]="'Severity'">
+      {{ "Alarm Severity" }}
+    </label>
+    <div class="c8y-select-wrapper">
+      <select
+        class="form-control"
+        (change)="selectionChanged($event)"
+        [(ngModel)]="config.severity"
+      >
+        @for (entry of severities; track entry) {
+          <option [ngValue]="entry">{{ entry }}</option>
+        }
+      </select>
+    </div>
+  </c8y-form-group>
+  <c8y-form-group>
+    <label class="c8y-switch">
+      <input type="checkbox" [(ngModel)]="config.listen" [ngModelOptions]="{standalone: true}" />
+      <span></span>Listen to updates
+    </label>
+  </c8y-form-group>
+  @if (config.listen) {
+    <c8y-form-group>
+      <label [title]="'Listen to property'"> Listen to property </label>
+      <input
+        type="text"
+        style="width:100%"
+        [(ngModel)]="config.listenProperty"
+      />
+    </c8y-form-group>
+  }
+</div>
+
+<ng-template #sampleWidgetPreview>
+  <c8y-widget-plugin [config]="config"></c8y-widget-plugin>
+</ng-template>

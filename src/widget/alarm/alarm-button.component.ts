@@ -18,32 +18,28 @@
  *
  * @authors Christof Strack
  */
-import {
-  Component,
-  Input,
-  OnInit,
-  ViewEncapsulation,
-} from "@angular/core";
+import { Component, Input, OnInit, ViewEncapsulation } from "@angular/core";
 import { IAlarm } from "@c8y/client";
+import { ModalLabels } from "@c8y/ngx-components";
+import { gettext } from "@c8y/ngx-components/gettext";
 import { Subject } from "rxjs";
 
 @Component({
-  selector: "raise-alarm",
-  templateUrl: "raise-alarm.component.html",
-  styleUrls: ["../raise-alarm.style.css"],
+  selector: "alarm-button",
+  templateUrl: "alarm-button.component.html",
+  styleUrls: ["../alarm-button.style.css"],
   encapsulation: ViewEncapsulation.None,
+  standalone:false
 })
-export class RaiseAlarmModalComponent implements OnInit {
-  // @ViewChild("raiseAlarmRef", { static: false }) raiseAlarmRef: ConfirmModalComponent;
-  // labels: ModalLabels = {
-  //   ok: gettext("Raise Alarm"),
-  //   cancel: gettext("Cancel"),
-  // };
-  // title = gettext("Raise Alarm");
-  // status: StatusType = Status.INFO;
-
+export class AlarmButtonModalComponent implements OnInit {
   @Input() alarm: IAlarm;
-  closeSubject: Subject<IAlarm> = new Subject();
+  closeSubject: Subject<IAlarm | undefined> = new Subject();
+
+  title = gettext("Raise Alarm");
+  labels: ModalLabels = {
+    ok: gettext("Raise Alarm"),
+    cancel: gettext("Cancel"),
+  };
 
   severities: string[] = ["CRITICAL", "MAJOR", "MINOR", "WARNING"];
 
@@ -51,26 +47,13 @@ export class RaiseAlarmModalComponent implements OnInit {
     console.log("Specified alarm:", this.alarm);
   }
 
-  // async ngAfterViewInit() {
-  //   try {
-  //     await this.raiseAlarmRef.result;
-  //     this.clickedRaiseAlarm();
-  //   } catch (error) {
-  //     this.clickedCancel();
-  //   }
-  // }
-
-  selectionChanged(e) {
-    console.log(e);
-  }
-
-  clickedRaiseAlarm() {
+  onDone() {
     this.closeSubject.next(this.alarm);
     this.closeSubject.complete();
   }
 
-  clickedCancel() {
-    this.closeSubject.next();
+  onDismiss() {
+    this.closeSubject.next(undefined);
     this.closeSubject.complete();
   }
 }

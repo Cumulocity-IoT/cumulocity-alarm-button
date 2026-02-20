@@ -1,22 +1,16 @@
 import { Injectable } from "@angular/core";
-import {
-  IManagedObject,
-  AlarmService,
-  IResult,
-  QueriesUtil,
-  IAlarm,
-  Realtime,
-} from "@c8y/client";
+import { AlarmService, IAlarm, Realtime } from "@c8y/client";
+import type { SubscriptionHandle } from "cometd";
 
 @Injectable({ providedIn: "root" })
-export class RaiseAlarmService {
+export class AlarmButtonService {
 
   constructor(
     protected alarmService: AlarmService,
     protected realtime: Realtime
   ) {}
 
-  async startListenToUpdate(device: string, callback: (data: any) => void): Promise<object>  {
+  async startListenToUpdate(device: string, callback: (data: any) => void): Promise<SubscriptionHandle> {
     return this.realtime.subscribe(`/alarms/${device}`, callback);
   }
 
@@ -27,7 +21,7 @@ export class RaiseAlarmService {
     return data;
   }
 
-  stopListenToUpdate(subscription: object): object {
-    return this.realtime.unsubscribe(subscription);
+  stopListenToUpdate(subscription: SubscriptionHandle): void {
+    this.realtime.unsubscribe(subscription);
   }
 }

@@ -32,14 +32,14 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: 'lts/*'
           cache: 'npm'
 
       - name: Install dependencies
@@ -53,13 +53,13 @@ jobs:
 
       - name: Zip build
         run: |
-          cd dist/apps/sag-ps-pkg-raise-alarm
+          cd dist/cumulocity-alarm-button
           zip -r -q ../../build.zip *
-          cd ../../..
-          rm -r dist/apps
+          cd ../..
+          rm -r dist/cumulocity-alarm-button
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           if-no-files-found: error
@@ -77,12 +77,12 @@ jobs:
       version: ${{ steps.save-version.outputs.version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
 
@@ -109,30 +109,30 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: v${{ needs.release.outputs.version }}
-  
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: 'lts/*'
           cache: 'npm'
-  
+
       - name: Install dependencies
         run: npm ci
-  
+
       - name: Build
         run: npm run build:ci
-  
+
       - name: Zip build
         run: |
-          cd dist/apps/sag-ps-pkg-raise-alarm
+          cd dist/cumulocity-alarm-button
           zip -r -q ../../../cumulocity-raise-alarm-${{ needs.release.outputs.version }}.zip *
           cd ../../..
-          rm -r dist/apps
-  
+          rm -r dist/cumulocity-alarm-button
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:

@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { RaiseAlarmService } from "./raise-alarm-plugin.service";
+import { AlarmButtonService } from "./alarm-button.service";
 import { IAlarm } from "@c8y/client";
 import { AlertService } from "@c8y/ngx-components";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
-import { RaiseAlarmModalComponent } from "./alarm/raise-alarm.component";
+import { AlarmButtonModalComponent } from "./alarm/alarm-button.component";
 
 @Component({
   selector: "c8y-widget-plugin",
@@ -26,11 +26,12 @@ import { RaiseAlarmModalComponent } from "./alarm/raise-alarm.component";
       }
     `,
   ],
+  standalone:false
 })
-export class RaiseAlarmPluginComponent implements OnInit {
+export class AlarmButtonComponent implements OnInit {
   @Input() config;
   constructor(
-    private service: RaiseAlarmService,
+    private service: AlarmButtonService,
     private alerService: AlertService,
     public bsModalService: BsModalService
   ) {}
@@ -58,7 +59,7 @@ export class RaiseAlarmPluginComponent implements OnInit {
       alarm: alarm,
     };
     const modalRef: BsModalRef = this.bsModalService.show(
-      RaiseAlarmModalComponent,
+      AlarmButtonModalComponent,
       { initialState }
     );
     modalRef.content.closeSubject.subscribe((alarm: IAlarm) => {
