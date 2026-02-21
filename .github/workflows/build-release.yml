@@ -54,7 +54,7 @@ jobs:
       - name: Zip build
         run: |
           cd dist/cumulocity-alarm-button
-          zip -r -q ../../build.zip *
+          zip -r -q ../build.zip *
           cd ../..
           rm -r dist/cumulocity-alarm-button
 
@@ -129,8 +129,8 @@ jobs:
       - name: Zip build
         run: |
           cd dist/cumulocity-alarm-button
-          zip -r -q ../../../cumulocity-raise-alarm-${{ needs.release.outputs.version }}.zip *
-          cd ../../..
+          zip -r -q ../../cumulocity-raise-alarm-${{ needs.release.outputs.version }}.zip *
+          cd ../..
           rm -r dist/cumulocity-alarm-button
 
       - name: Release
