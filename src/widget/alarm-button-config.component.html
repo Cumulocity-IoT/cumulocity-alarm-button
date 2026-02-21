@@ -16,11 +16,84 @@
     />
   </c8y-form-group>
   <c8y-form-group>
+    <label>Button Style</label>
+    <div class="dropdown" style="width:100%" dropdown>
+      <button type="button" style="width:100%" dropdownToggle
+        [ngClass]="'btn dropdown-toggle c8y-dropdown ' + (config.buttonStyle || 'btn-default')">
+        <span>{{ config.buttonStyle || 'Default' }}</span>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" style="width:100%" *dropdownMenu>
+        @for (style of buttonStyles; track style.value) {
+          <li (click)="config.buttonStyle = style.value">
+            <button type="button" style="width:100%" [ngClass]="'btn ' + style.value">
+              {{ style.label }}
+            </button>
+          </li>
+        }
+      </ul>
+    </div>
+  </c8y-form-group>
+  <c8y-form-group>
+    <label>Button Size</label>
+    <div class="c8y-select-wrapper">
+      <select class="form-control" [(ngModel)]="config.buttonSize">
+        @for (size of buttonSizes; track size.value) {
+          <option [ngValue]="size.value">{{ size.label }}</option>
+        }
+      </select>
+    </div>
+  </c8y-form-group>
+  <c8y-form-group>
+    <label>Button Icon</label>
+    <div class="dropdown" style="width:100%" dropdown>
+      <button type="button" class="btn btn-default dropdown-toggle" style="width:100%" dropdownToggle>
+        <span class="d-flex a-i-center">
+          @if (config.buttonIcon) {
+            <i [c8yIcon]="config.buttonIcon" class="m-r-8"></i>
+          }
+          <span>{{ config.buttonIcon || 'Choose icon...' }}</span>
+        </span>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" style="width:100%; max-height:250px; overflow-y:auto" *dropdownMenu>
+        <li class="p-4">
+          <input type="text" class="form-control input-sm" placeholder="Search icons..."
+            [(ngModel)]="iconSearchTerm" [ngModelOptions]="{standalone: true}"
+            (click)="$event.stopPropagation()" autocomplete="off" />
+        </li>
+        @if (config.buttonIcon) {
+          <li>
+            <button type="button" class="dropdown-item" (click)="config.buttonIcon = null">
+              <i [c8yIcon]="'clear'"></i><span class="m-l-8">None</span>
+            </button>
+          </li>
+        }
+        @for (iconClass of filteredIcons; track iconClass) {
+          <li>
+            <button type="button" class="dropdown-item" (click)="config.buttonIcon = iconClass"
+              [class.active]="config.buttonIcon === iconClass">
+              <i [c8yIcon]="iconClass"></i>
+              <span class="m-l-8">{{ iconClass }}</span>
+            </button>
+          </li>
+        }
+        @if (filteredIcons.length === 0) {
+          <li>
+            <div class="p-16 text-muted text-center">No icons found for "{{ iconSearchTerm }}"</div>
+          </li>
+        }
+      </ul>
+    </div>
+  </c8y-form-group>
+  <c8y-form-group>
     <label>Alarm Type</label>
     <input
       style="width:100%"
       placeholder="e.g. c8y_BreakdownAlarmType"
       [(ngModel)]="config.type"
+      (ngModelChange)="onTypeChange($event)"
+      required
     />
   </c8y-form-group>
   <c8y-form-group>
@@ -30,7 +103,6 @@
     <div class="c8y-select-wrapper">
       <select
         class="form-control"
-        (change)="selectionChanged($event)"
         [(ngModel)]="config.severity"
       >
         @for (entry of severities; track entry) {
@@ -38,6 +110,15 @@
         }
       </select>
     </div>
+  </c8y-form-group>
+  <c8y-form-group>
+    <label class="c8y-switch">
+      <input type="checkbox" [(ngModel)]="config.alwaysUseDefault" [ngModelOptions]="{standalone: true}"
+        [disabled]="!config.type?.trim()" />
+      <span></span>Always use default values
+    </label>
+    <c8y-messages [helpMessage]="'When enabled, alarms are created immediately using the configured values without showing the confirmation dialog. Requires alarm type to be set.'" [visible]="true">
+    </c8y-messages>
   </c8y-form-group>
   <c8y-form-group>
     <label class="c8y-switch">
@@ -53,6 +134,8 @@
         style="width:100%"
         [(ngModel)]="config.listenProperty"
       />
+      <c8y-messages [helpMessage]="'Enter the name of custom property to monitor for value changes in alarm (e.g. affectedService).'" [visible]="true">
+      </c8y-messages>
     </c8y-form-group>
   }
 </div>

@@ -18,9 +18,9 @@
  *
  * @authors Christof Strack
  */
-import { Component, Input, OnInit, ViewEncapsulation } from "@angular/core";
+import { Component, Input, ViewEncapsulation } from "@angular/core";
 import { IAlarm } from "@c8y/client";
-import { ModalLabels } from "@c8y/ngx-components";
+import { CoreModule, FormsModule, ModalLabels, SelectModule } from "@c8y/ngx-components";
 import { gettext } from "@c8y/ngx-components/gettext";
 import { Subject } from "rxjs";
 
@@ -29,9 +29,10 @@ import { Subject } from "rxjs";
   templateUrl: "alarm-button.component.html",
   styleUrls: ["../alarm-button.style.css"],
   encapsulation: ViewEncapsulation.None,
-  standalone:false
+  standalone: true,
+  imports: [CoreModule, FormsModule, SelectModule]
 })
-export class AlarmButtonModalComponent implements OnInit {
+export class AlarmButtonModalComponent {
   @Input() alarm: IAlarm;
   closeSubject: Subject<IAlarm | undefined> = new Subject();
 
@@ -42,10 +43,6 @@ export class AlarmButtonModalComponent implements OnInit {
   };
 
   severities: string[] = ["CRITICAL", "MAJOR", "MINOR", "WARNING"];
-
-  ngOnInit(): void {
-    console.log("Specified alarm:", this.alarm);
-  }
 
   onDone() {
     this.closeSubject.next(this.alarm);

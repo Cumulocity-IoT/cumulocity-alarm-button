@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { AlarmButtonService } from "./alarm-button.service";
 import { IAlarm } from "@c8y/client";
-import { AlertService } from "@c8y/ngx-components";
+import { AlertService, CoreModule } from "@c8y/ngx-components";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { AlarmButtonModalComponent } from "./alarm/alarm-button.component";
 
@@ -11,28 +11,24 @@ import { AlarmButtonModalComponent } from "./alarm/alarm-button.component";
     <div class="p-32 text-center">
       <button
         type="button"
-        class="btn btn-default"
+        [ngClass]="['btn', config.buttonStyle || 'btn-default', config.buttonSize || '']"
         (click)="clickedRaiseAlarm()"
       >
+        @if (config.buttonIcon) {
+          <i [c8yIcon]="config.buttonIcon"></i>
+        }
         {{config.buttonText}}
       </button>
     </div>
   `,
-  styles: [
-    `
-      .text {
-        transform: scaleX(-1);
-        font-size: 3em;
-      }
-    `,
-  ],
-  standalone:false
+  standalone: true,
+  imports: [CoreModule]
 })
 export class AlarmButtonComponent implements OnInit {
   @Input() config;
   constructor(
     private service: AlarmButtonService,
-    private alerService: AlertService,
+    private alertService: AlertService,
     public bsModalService: BsModalService
   ) {}
 
@@ -45,9 +41,7 @@ export class AlarmButtonComponent implements OnInit {
   clickedRaiseAlarm() {
     const timestamp: number = Date.now();
     const iso_string: string = new Date().toISOString();
-    //const text: string = this.config.text + "-" + timestamp;
-    //const text: string = `${this.config.text}`;
-    const text: string = eval('`'+ this.config.text +'`');
+    const text: string = this.interpolate(this.config.text ?? '', { timestamp, iso_string });
     const alarm: IAlarm = {
       severity: this.config.severity,
       source: { id: this.config?.device?.id },
@@ -55,43 +49,44 @@ export class AlarmButtonComponent implements OnInit {
       type: this.config.type,
       time: new Date().toISOString(),
     };
-    const initialState = {
-      alarm: alarm,
-    };
+
+    if (this.config.alwaysUseDefault) {
+      this.raiseAlarm(alarm);
+      return;
+    }
+
+    const initialState = { alarm };
     const modalRef: BsModalRef = this.bsModalService.show(
       AlarmButtonModalComponent,
       { initialState }
     );
-    modalRef.content.closeSubject.subscribe((alarm: IAlarm) => {
-      console.log("Result alarm", alarm);
-      if (alarm) {
-        this.raiseAlarm(alarm);
-        modalRef.hide();
-      } else {
-        console.log("Cancel created new alarm!");
-        modalRef.hide();
+    modalRef.content.closeSubject.subscribe((result: IAlarm) => {
+      if (result) {
+        this.raiseAlarm(result);
       }
+      modalRef.hide();
     });
   }
 
   async raiseAlarm(alarm: IAlarm) {
-    const result: IAlarm = await this.service.createAlarm(alarm);
-    console.log("Created new alarm: ", result);
-    this.alerService.info("Created new alarm: " + result.id);
+    try {
+      const result: IAlarm = await this.service.createAlarm(alarm);
+      this.alertService.info("Created new alarm: " + result.id);
+    } catch (error: any) {
+      this.alertService.danger(error?.message ?? "Failed to create alarm.");
+    }
   }
 
   newUpdate(p: any): void {
     const config = this.config;
-    //console.log("New update: ", p, config);
-    let prop = p["data"]["data"][config.listenProperty];
-    let data = p["data"]["data"];
-    if (prop === undefined) {
-      console.log("New update not relevant: ", prop, data);
-    } else {
-      //console.log("New update relevant: ", prop, data);
-      this.alerService.info(`Update for alarm ${data.id}: ${config.listenProperty} = ${prop}`);
+    const prop = p["data"]["data"][config.listenProperty];
+    const data = p["data"]["data"];
+    if (prop !== undefined) {
+      this.alertService.info(`Update for alarm ${data.id}: ${config.listenProperty} = ${prop}`);
     }
   }
 
+  private interpolate(template: string, vars: Record<string, unknown>): string {
+    return template.replace(/\$\{(\w+)\}/g, (_, key) => String(vars[key] ?? ''));
+  }
 }
-

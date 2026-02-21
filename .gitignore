@@ -34,3 +34,4 @@ bin/
 node_modules
 dist
 .angular
+attic/SPECIFICATION.md
