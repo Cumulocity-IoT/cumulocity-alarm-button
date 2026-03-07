@@ -32,8 +32,9 @@ export default {
     copy: [
       {
         from: 'src/assets/raise-alarm-config.png',
-        to: 'images/raise-alarm-config.png',
+        to: 'assets/raise-alarm-config.png',
       },
+      { from: 'README.md', to: 'README.md' },
     ],
     federation: [
       '@angular/animations',
